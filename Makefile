@@ -2,16 +2,19 @@ build-image:
 	docker build . -t benbergstein/route-web:latest
 
 install:
-	docker-compose -f ../docker/docker-compose.yml run client install
+	docker-compose run client install
+
+start-routeservice:
+	docker-compose run -d -p "8080:8080" routeservice
 
 start:
-	docker-compose -f ../docker/docker-compose.yml run -d --service-ports client
+	docker-compose up -d
 
 serve:
-	docker-compose -f ../docker/docker-compose.yml run -d -p "80:5000" client serve
+	docker-compose run -d -p "80:5000" client serve
 
 stop:
-	docker-compose -f ../docker/docker-compose.yml stop client
+	docker-compose down --remove-orphans
 
-build:
-	docker-compose -f ../docker/docker-compose.yml run client build
+build-js:
+	docker-compose run client build
