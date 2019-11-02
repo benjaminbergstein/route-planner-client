@@ -1,0 +1,39 @@
+{
+  "name": "route-web",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "fetch": "^1.1.0",
+    "leaflet": "^1.5.1",
+    "lodash": "^4.17.15",
+    "lz-string": "^1.4.4",
+    "react": "^16.11.0",
+    "react-dom": "^16.11.0",
+    "react-leaflet": "^2.5.0",
+    "react-scripts": "3.2.0",
+    "recompose": "^0.30.0",
+    "serve": "^11.2.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "serve": "serve -s build -l 5000"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
