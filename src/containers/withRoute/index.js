@@ -1,8 +1,9 @@
 import React from 'react';
-import buildPath from './route/buildPath.js';
 import get from 'lodash/get';
 import slice from 'lodash/slice';
 import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';
+
+import buildPath from './buildPath.js';
 
 const serializePath = (path) => compressToEncodedURIComponent(JSON.stringify(path));
 const deserializePath = (serialized) => JSON.parse(decompressFromEncodedURIComponent(serialized));

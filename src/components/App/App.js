@@ -4,10 +4,10 @@ import { Map, TileLayer, Circle, Polyline } from 'react-leaflet';
 import L from 'leaflet';
 
 import './App.css';
-import withRoute from './withRoute';
-import withTarget from './withTarget';
-import withLocationHash from './withLocationHash';
-import { ControlsPanel, Button } from './Controls';
+import withRoute from '../../containers/withRoute/index';
+import withTarget from '../../containers/withTarget';
+import withLocationHash from '../../containers/withLocationHash';
+import { ControlsPanel, Button } from '../Controls';
 
 const determineBounds = ({ loading, path }) => {
   if (loading && path.length > 0) {
