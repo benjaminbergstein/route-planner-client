@@ -1,4 +1,4 @@
-const ROUTING_HOST = 'dev-1.wips.link';
+const ROUTING_HOST = process.env.REACT_APP_HOSTNAME;
 const ROUTING_URL = `http://${ROUTING_HOST}:8080/ors/v2/directions`;
 const routeCache = {};
 const fetchRoute = ([ start, end ]) => {

@@ -18,6 +18,7 @@ services:
       image: benbergstein/route-web:latest
       environment:
          - REACT_APP_TILE_SERVICE_KEY=${TILE_SERVICE_KEY}
+         - REACT_APP_HOSTNAME=${HOSTNAME}
       ports:
          - 3000:3000
       volumes:
