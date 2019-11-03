@@ -1,13 +1,21 @@
 import React, { useState } from 'react';
 import compose from 'recompose/compose';
 import slice from 'lodash/slice';
-import { Map, TileLayer, Circle, Polyline } from 'react-leaflet';
+import {
+  Map,
+  Pane,
+  LayerGroup,
+  TileLayer,
+  Circle,
+  Polyline,
+} from 'react-leaflet';
 import L from 'leaflet';
 
 import './App.css';
 import withRoute from '../../containers/withRoute/index';
-import withTarget from '../../containers/withTarget';
+import withTarget, { TARGET_MODES } from '../../containers/withTarget';
 import withLocationHash from '../../containers/withLocationHash';
+import withBrowser from '../../containers/withBrowser';
 import { ControlsPanel, Button } from '../Controls';
 import HoverCircle from '../HoverCircle';
 
@@ -38,6 +46,7 @@ class App extends React.Component {
     const {
       accessToken,
       setTarget,
+      clearTarget,
       undo,
       redo,
       clear,
@@ -46,6 +55,7 @@ class App extends React.Component {
       routeMetadata,
       target,
       targetType,
+      targetMode,
       loading,
     } = this.props;
     const {
@@ -69,7 +79,7 @@ class App extends React.Component {
     return (
       <div style={{position: 'relative', height: '100%'}}>
         <Map
-          dragging={target === undefined}
+          dragging={target === undefined || targetMode === TARGET_MODES.DOUBLE_CLICK}
           style={{height: '100%'}}
           onViewportChanged={({ zoom }) => this.setState({ zoom })}
           onClick={this.handleClick}
@@ -80,14 +90,6 @@ class App extends React.Component {
             url={`https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=${accessToken}`}
             id='mapbox.streets'
           />
-          {path.map((latlng) => (
-            <HoverCircle
-              profile='LARGE'
-              center={latlng}
-              zoom={zoom}
-              onMouseDown={(e) => setTarget('waypoint', e.target, { latlng })}
-            />
-          ))}
           {lines.map((coords, i) => (
             <>
               <Polyline
@@ -95,7 +97,7 @@ class App extends React.Component {
                 positions={coords}
                 onMouseDown={(e) => setTarget('polyline', e.target, { startLatlng: path[i] })}
               />
-              {slice(coords, 1, -1).map((latlng) => (
+              {slice(coords, 1, -1).map((latlng, ii) => ii % 3 === 0 && (
                 <HoverCircle
                   zoom={zoom}
                   profile='SMALL'
@@ -105,11 +107,25 @@ class App extends React.Component {
               ))}
             </>
           ))}
+          <Pane name='coordinates'>
+            {path.map((latlng) => (
+              <HoverCircle
+                pane='coordinates'
+                profile='LARGE'
+                center={latlng}
+                zoom={zoom}
+                onMouseDown={(e) => setTarget('waypoint', e.target, { latlng })}
+              />
+            ))}
+          </Pane>
         </Map>
         <ControlsPanel>
-          <Button onClick={undo} text='Undo' />
-          <Button onClick={redo} text='Redo' />
-          <Button onClick={clear} text='Clear' />
+          {target && targetMode === TARGET_MODES.DOUBLE_CLICK && (
+            <Button onClick={clearTarget}>Clear Selection</Button>
+          )}
+          <Button onClick={undo}>Undo</Button>
+          <Button onClick={redo}>Redo</Button>
+          <Button onClick={clear}>Clear</Button>
           <div style={{flex: '1'}}>{totalDistanceMiles} miles</div>
         </ControlsPanel>
       </div>
@@ -124,22 +140,25 @@ class App extends React.Component {
       target,
       targetType,
       targetData,
+      getTargetState,
     } = this.props;
 
-    if (target) {
+    const targetState = getTargetState();
+
+    if (targetState === 'ready') {
       if (targetType === 'polyline') {
         const { startLatlng } = targetData;
-        clearTarget();
         appendPoint({ latlng, after: startLatlng });
+        clearTarget();
       } else if (targetType === 'waypoint') {
         const { latlng: oldLatlng } = targetData;
-        clearTarget();
         movePoint(oldLatlng, latlng);
+        clearTarget();
       }
-    } else {
+    } else if (targetState === false) {
       appendPoint({ latlng });
     }
   }
 }
 
-export default withLocationHash(withRoute(withTarget(App)));
+export default withBrowser(withLocationHash(withRoute(withTarget(App))));

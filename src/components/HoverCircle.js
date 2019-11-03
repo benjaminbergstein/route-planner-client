@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Circle } from 'react-leaflet';
 
+const BLUE = '#5494ff';
+
 const PROFILES = {
   SMALL: {
-    radius: 1,
+    radius: 1.5,
     baseOpacity: 0.8,
   },
   LARGE: {
@@ -21,11 +23,11 @@ const HoverCircle = ({ zoom, profile, ...props }) => {
       radius={(hover ? radius * 1.5 : radius) * zoomFactor}
       onMouseOver={() => setHover(true)}
       onMouseOut={() => setHover(false)}
-      fillColor={hover ? 'white' : '#4285f4'}
-      fillOpacity={(hover ? 1 : 0.8) * baseOpacity}
+      fillColor={hover ? 'white' : BLUE}
+      fillOpacity={1}
       color='gray'
       weight={hover ? 5 : 1}
-      opacity={(hover ? 0.8 : 0.8) * baseOpacity}
+      opacity={1}
       {...props}
     />
   )

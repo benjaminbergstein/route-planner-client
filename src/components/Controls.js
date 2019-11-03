@@ -4,7 +4,7 @@ const ControlsPanel = ({ children }) => (
   <div
     style={{
       position: 'absolute',
-      top: '10px',
+      bottom: '20px',
       right: '10px',
       zIndex: 1000,
       border: '1px solid gray',
@@ -21,7 +21,7 @@ const ControlsPanel = ({ children }) => (
   </div>
 );
 
-const Button = ({ onClick, text }) => (
+const Button = ({ onClick, children}) => (
   <div style={{flex: '1 1 100%'}}>
     <button
       style={{
@@ -31,7 +31,7 @@ const Button = ({ onClick, text }) => (
       }}
       onClick={onClick}
   >
-    {text}
+    {children}
   </button>
   </div>
 )
