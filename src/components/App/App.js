@@ -10,6 +10,7 @@ import withLocationHash from '../../containers/withLocationHash';
 import withBrowser from '../../containers/withBrowser';
 import withTrackEvent from '../../containers/withTrackEvent';
 import withDragging from '../../containers/withDragging';
+import haversine from '../../haversine';
 import { ControlsPanel, Button } from '../Controls';
 import RoutePlotter from '../RoutePlotter';
 
@@ -110,11 +111,13 @@ class App extends React.Component {
     const {
       appendPoint,
       movePoint,
+      setTarget,
       clearTarget,
       targetType,
       targetData,
       getTargetState,
       trackEvent,
+      path,
     } = this.props;
 
     const targetState = getTargetState();

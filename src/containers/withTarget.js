@@ -52,7 +52,7 @@ const withTarget = (Component) =>
       }
     }
 
-    setTarget(targetType, target, targetData) {
+    setTarget(targetType, target, targetData, setCaptured) {
       const { targetMode } = this.state;
 
       if (targetMode !== TARGET_MODES.DOUBLE_CLICK) {
@@ -60,7 +60,7 @@ const withTarget = (Component) =>
       }
 
       this.setState({
-        targetCaptured: targetMode === TARGET_MODES.DEFAULT,
+        targetCaptured: setCaptured || targetMode === TARGET_MODES.DEFAULT,
         targetType,
         targetData,
         target
