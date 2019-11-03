@@ -1,10 +1,19 @@
 version: '3'
 services:
+   haproxy:
+      image: haproxy:1.7
+      ports:
+         - "80:80"
+      volumes:
+         - ./config/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+      networks:
+         - routeplanner
+
    routeservice:
       container_name: ors-app
       ports:
          - 8080:8080
-      image: "benbergstein/open-route-service:SanFrancisco"
+      image: benbergstein/open-route-service:BayArea
       volumes:
          - ./data/graphs:/ors-core/data/graphs
          - ./data/elevation_cache:/ors-core/data/elevation_cache
@@ -13,13 +22,35 @@ services:
       environment:
          - JAVA_OPTS=-Djava.awt.headless=true -server -XX:TargetSurvivorRatio=75 -XX:SurvivorRatio=64 -XX:MaxTenuringThreshold=3 -XX:+UseConcMarkSweepGC -XX:+UseParNewGC -XX:ParallelGCThreads=4 -Xms1g -Xmx20g
          - CATALINA_OPTS= -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9001 -Dcom.sun.management.jmxremote.rmi.port=9001 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=localhost
+      networks:
+         - routeplanner
 
    client:
       image: benbergstein/route-web:latest
       environment:
          - REACT_APP_TILE_SERVICE_KEY=${TILE_SERVICE_KEY}
          - REACT_APP_HOSTNAME=${HOSTNAME}
+         - REACT_APP_ROUTING_HOST=route.${HOSTNAME}
       ports:
-         - 3000:3000
+         - 5000:3000
       volumes:
          - .:/app
+      networks:
+         - routeplanner
+
+   serve:
+      image: benbergstein/route-web:latest
+      environment:
+         - REACT_APP_TILE_SERVICE_KEY=${TILE_SERVICE_KEY}
+         - REACT_APP_HOSTNAME=${HOSTNAME}
+         - REACT_APP_ROUTING_HOST=route.${HOSTNAME}
+      command: ["serve"]
+      ports:
+         - 3000:5000
+      volumes:
+         - .:/app
+      networks:
+         - routeplanner
+
+networks:
+   routeplanner:
