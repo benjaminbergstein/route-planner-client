@@ -15,7 +15,6 @@ const HoverCircle = ({ zoom, profile, ...props }) => {
   const [hover, setHover] = useState(false);
   const { radius, baseOpacity } = PROFILES[profile];;
   const zoomFactor = Math.pow(31 - zoom, 4) / 6000;
-  console.log(zoom, zoomFactor)
 
   return (
     <Circle

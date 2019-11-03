@@ -43,19 +43,29 @@ class App extends React.Component {
       clear,
       path,
       lines,
-      totalDistance,
+      routeMetadata,
       target,
       targetType,
       loading,
     } = this.props;
+    const {
+      totalDistanceMiles,
+      startStreet,
+      endStreet,
+      topStreets,
+    } = routeMetadata;
     const { zoom } = this.state;
+
+    if (startStreet) {
+      const description = `${totalDistanceMiles} mile(s), ${startStreet} - ${endStreet} via ${topStreets.join(' & ')}`;
+      global.document.title = description;
+    }
 
     const bounds = determineBounds({ loading, path })
     const additionalProps = bounds ?
       { bounds } : loading ?
       INIITAL_CENTER : {};
 
-    const totalMiles = Math.floor(totalDistance * MILES_PER_METER * 100.0) / 100.0
     return (
       <div style={{position: 'relative', height: '100%'}}>
         <Map
@@ -100,7 +110,7 @@ class App extends React.Component {
           <Button onClick={undo} text='Undo' />
           <Button onClick={redo} text='Redo' />
           <Button onClick={clear} text='Clear' />
-          <div style={{flex: '1'}}>{totalMiles} miles</div>
+          <div style={{flex: '1'}}>{totalDistanceMiles} miles</div>
         </ControlsPanel>
       </div>
     );
