@@ -16,6 +16,7 @@ import withRoute from '../../containers/withRoute/index';
 import withTarget, { TARGET_MODES } from '../../containers/withTarget';
 import withLocationHash from '../../containers/withLocationHash';
 import withBrowser from '../../containers/withBrowser';
+import withTrackEvent from '../../containers/withTrackEvent';
 import { ControlsPanel, Button } from '../Controls';
 import HoverCircle from '../HoverCircle';
 
@@ -57,6 +58,7 @@ class App extends React.Component {
       targetType,
       targetMode,
       loading,
+      wrapWithTrackEvent,
     } = this.props;
     const {
       totalDistanceMiles,
@@ -93,6 +95,7 @@ class App extends React.Component {
           {lines.map((coords, i) => (
             <>
               <Polyline
+                weight='5'
                 opacity={0.6}
                 positions={coords}
                 onMouseDown={(e) => setTarget('polyline', e.target, { startLatlng: path[i] })}
@@ -121,11 +124,11 @@ class App extends React.Component {
         </Map>
         <ControlsPanel>
           {target && targetMode === TARGET_MODES.DOUBLE_CLICK && (
-            <Button onClick={clearTarget}>Clear Selection</Button>
+            <Button onClick={wrapWithTrackEvent(clearTarget, { action: 'clearTarget' })}>Clear Selection</Button>
           )}
-          <Button onClick={undo}>Undo</Button>
-          <Button onClick={redo}>Redo</Button>
-          <Button onClick={clear}>Clear</Button>
+          <Button onClick={wrapWithTrackEvent(undo, { action: 'undo' })}>Undo</Button>
+          <Button onClick={wrapWithTrackEvent(redo, { action: 'redo' })}>Redo</Button>
+          <Button onClick={wrapWithTrackEvent(clear, { action: 'clear' })}>Clear</Button>
           <div style={{flex: '1'}}>{totalDistanceMiles} miles</div>
         </ControlsPanel>
       </div>
@@ -141,6 +144,7 @@ class App extends React.Component {
       targetType,
       targetData,
       getTargetState,
+      trackEvent,
     } = this.props;
 
     const targetState = getTargetState();
@@ -150,15 +154,24 @@ class App extends React.Component {
         const { startLatlng } = targetData;
         appendPoint({ latlng, after: startLatlng });
         clearTarget();
+        trackEvent({ action: 'appendPoint:insert' })
       } else if (targetType === 'waypoint') {
         const { latlng: oldLatlng } = targetData;
         movePoint(oldLatlng, latlng);
         clearTarget();
+        trackEvent({ action: 'appendPoint:insert' })
       }
     } else if (targetState === false) {
       appendPoint({ latlng });
+      trackEvent({ action: 'appendPoint:push' })
     }
   }
 }
 
-export default withBrowser(withLocationHash(withRoute(withTarget(App))));
+export default compose(
+  withTrackEvent('map'),
+  withBrowser,
+  withLocationHash,
+  withRoute,
+  withTarget
+)(App);

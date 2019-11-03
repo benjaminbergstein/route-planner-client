@@ -20,7 +20,6 @@ const withBrowser= (Component) =>
     }
 
     render() {
-      console.log('browser');
       return <Component
         browser={{
           width: this.state.width,
