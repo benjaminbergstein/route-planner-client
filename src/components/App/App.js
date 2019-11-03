@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import compose from 'recompose/compose';
+import slice from 'lodash/slice';
 import { Map, TileLayer, Circle, Polyline } from 'react-leaflet';
 import L from 'leaflet';
 
@@ -8,6 +9,7 @@ import withRoute from '../../containers/withRoute/index';
 import withTarget from '../../containers/withTarget';
 import withLocationHash from '../../containers/withLocationHash';
 import { ControlsPanel, Button } from '../Controls';
+import HoverCircle from '../HoverCircle';
 
 const determineBounds = ({ loading, path }) => {
   if (loading && path.length > 0) {
@@ -28,7 +30,7 @@ const INIITAL_CENTER = {
 class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = { zoom: 15 };
     this.handleClick = this.handleClick.bind(this);
   }
 
@@ -46,6 +48,7 @@ class App extends React.Component {
       targetType,
       loading,
     } = this.props;
+    const { zoom } = this.state;
 
     const bounds = determineBounds({ loading, path })
     const additionalProps = bounds ?
@@ -58,6 +61,7 @@ class App extends React.Component {
         <Map
           dragging={target === undefined}
           style={{height: '100%'}}
+          onViewportChanged={({ zoom }) => this.setState({ zoom })}
           onClick={this.handleClick}
           {...additionalProps}
         >
@@ -67,16 +71,29 @@ class App extends React.Component {
             id='mapbox.streets'
           />
           {path.map((latlng) => (
-            <Circle
+            <HoverCircle
+              profile='LARGE'
               center={latlng}
+              zoom={zoom}
               onMouseDown={(e) => setTarget('waypoint', e.target, { latlng })}
             />
           ))}
           {lines.map((coords, i) => (
-            <Polyline
-              positions={coords}
-              onMouseDown={(e) => setTarget('polyline', e.target, { startLatlng: path[i] })}
-            />
+            <>
+              <Polyline
+                opacity={0.6}
+                positions={coords}
+                onMouseDown={(e) => setTarget('polyline', e.target, { startLatlng: path[i] })}
+              />
+              {slice(coords, 1, -1).map((latlng) => (
+                <HoverCircle
+                  zoom={zoom}
+                  profile='SMALL'
+                  center={latlng}
+                  onMouseDown={(e) => setTarget('polyline', e.target, { startLatlng: path[i] })}
+                />
+              ))}
+            </>
           ))}
         </Map>
         <ControlsPanel>
