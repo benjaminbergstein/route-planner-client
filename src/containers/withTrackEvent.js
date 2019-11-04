@@ -22,7 +22,6 @@ const withTrackEvent = (category) => (Component) =>
 
     trackEvent({ action, label, value }) {
       const { gtag } = this.state;
-      console.log(gtag);
       if (gtag) {
         gtag('event', action, {
           event_category: category,

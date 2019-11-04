@@ -1,11 +1,19 @@
 version: '3'
 services:
+   letsencrypt:
+      image: certbot/certbot:latest
+      command: ["certonly", "-d", "${DOMAIN}", "--manual"]
+      volumes:
+         - ./data/letsencrypt:/etc/letsencrypt
+
    haproxy:
       image: haproxy:1.7
       ports:
          - "80:80"
+         - "443:443"
       volumes:
          - ./config/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+         - ./data/letsencrypt:/etc/letsencrypt
       networks:
          - routeplanner
 

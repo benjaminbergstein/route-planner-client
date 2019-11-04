@@ -27,8 +27,7 @@ const sameLatlng = (
   { lat: lat2, lng: lng2 }
 ) => lat1 === lat2 && lng1 === lng2;
 
-const getRouteMetadata = ({ streets, totalDistance }) => {
-  const totalDistanceMiles = Math.floor(totalDistance * MILES_PER_METER * 100.0) / 100.0
+const getRouteMetadata = ({ streets }) => {
   const streetTotals = slice(streets, 1, -1).reduce((memo, [street, dist]) => {
     return {
       ...memo,
@@ -45,8 +44,6 @@ const getRouteMetadata = ({ streets, totalDistance }) => {
     .reverse();
 
   return {
-    totalDistance,
-    totalDistanceMiles,
     startStreet,
     endStreet,
     topStreets,
@@ -90,13 +87,16 @@ const withRoute = (Component) =>
           return [[...lines, line], totalDistance + distance, [...streets, ...additionalStreets]]
         }, [[], 0, []]);
 
-        const routeMetadata = streets.length > 1 ?
-          getRouteMetadata({ streets, totalDistance }) :
-          { totalDistance, totalDistanceMiles: 0 };
+        const totalDistanceMiles = Math.floor(totalDistance * MILES_PER_METER * 100.0) / 100.0
+        const routeMetadata = streets.length > 1 ?  getRouteMetadata({ streets }) : {};
 
         this.setState({
           lines,
-          routeMetadata,
+          routeMetadata: {
+            ...routeMetadata,
+            totalDistance,
+            totalDistanceMiles,
+          },
         });
       });
       if (setPrevPath !== false) newPath.prevPath = path;
