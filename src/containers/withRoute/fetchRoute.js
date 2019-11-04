@@ -1,5 +1,6 @@
+const PROTOCOL = process.env.REACT_APP_HTTPS === 'true' ? 'https' : 'http';
 const ROUTING_HOST = process.env.REACT_APP_ROUTING_HOST;
-const ROUTING_URL = `http://${ROUTING_HOST}/ors/v2/directions`;
+const ROUTING_URL = `${PROTOCOL}://${ROUTING_HOST}/ors/v2/directions`;
 const routeCache = {};
 const fetchRoute = ([ start, end ]) => {
   if (routeCache[[start, end]]) return Promise.resolve(routeCache[[start, end]]);

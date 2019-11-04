@@ -7,6 +7,7 @@ ADD package.json /app/package.json
 RUN yarn
 
 ADD . /app
+RUN yarn build
 
 ENTRYPOINT ["yarn"]
-CMD ["start"]
+CMD ["serve"]
