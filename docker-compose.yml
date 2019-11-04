@@ -1,11 +1,5 @@
-version: '3'
+version: '3.7'
 services:
-   letsencrypt:
-      image: certbot/certbot:latest
-      command: ["certonly", "-d", "${DOMAIN}", "--manual"]
-      volumes:
-         - ${DATA_DIR:-./data}/letsencrypt:/etc/letsencrypt
-
    haproxy:
       image: haproxy:1.7
       ports:
