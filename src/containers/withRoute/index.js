@@ -1,7 +1,6 @@
 import React from 'react';
 import get from 'lodash/get';
 import slice from 'lodash/slice';
-import shuffle from 'lodash/shuffle';
 import first from 'lodash/first';
 import last from 'lodash/last';
 import sortBy from 'lodash/sortBy';
@@ -48,7 +47,8 @@ const getRouteMetadata = ({ streets }) => {
     endStreet,
     topStreets,
   };
-}
+};
+
 const withRoute = (Component) =>
   class extends React.Component {
     constructor(props) {
@@ -78,7 +78,6 @@ const withRoute = (Component) =>
       const { path, loading } = this.state;
       const promise = buildPath(newPath);
       promise.then((paths) => {
-        let i = 0;
         const [lines, totalDistance, streets] = paths.reduce(([lines, totalDistance, streets], p) => {
           const distance = get(p, 'features[0].properties.summary.distance');
           const additionalStreets = get(p, 'features[0].properties.segments[0].steps')

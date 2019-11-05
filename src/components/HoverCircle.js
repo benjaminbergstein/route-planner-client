@@ -4,33 +4,28 @@ import { Circle } from 'react-leaflet';
 const BLUE = '#5494ff';
 
 const PROFILES = {
-  SMALL: {
-    radius: 1.5,
-    baseOpacity: 0.8,
-  },
-  LARGE: {
-    radius: 2,
-    baseOpacity: 0.8,
-  },
-}
-const HoverCircle = ({ zoom, profile, ...props }) => {
-  const [hover, setHover] = useState(false);
-  const { radius, baseOpacity } = PROFILES[profile];;
+  SMALL: { radius: 1.5 },
+  LARGE: { radius: 2 },
+};
+
+const ActiveCircle = ({ zoom, profile, ...props }) => {
+  const [active, setActive] = useState(false);
+  const { radius } = PROFILES[profile];;
   const zoomFactor = Math.pow(31 - zoom, 4) / 6000;
 
   return (
     <Circle
-      radius={(hover ? radius * 1.5 : radius) * zoomFactor}
-      onMouseOver={() => setHover(true)}
-      onMouseOut={() => setHover(false)}
-      fillColor={hover ? 'white' : BLUE}
+      radius={(active ? radius * 1.5 : radius) * zoomFactor}
+      onMouseOver={() => setActive(true)}
+      onMouseOut={() => setActive(false)}
+      fillColor={active ? 'white' : BLUE}
       fillOpacity={1}
-      color='gray'
-      weight={hover ? 5 : 1}
-      opacity={1}
+      color='#6880a7'
+      weight={active ? 5 : 1}
+      opacity={active ? 0.7 : 1}
       {...props}
     />
   )
 };
 
-export default HoverCircle;
+export default ActiveCircle;

@@ -1,5 +1,4 @@
 import React from 'react';
-import get from 'lodash/get';
 
 const TARGET_MODES = {
   DOUBLE_CLICK: 'double-click',
@@ -21,7 +20,7 @@ const withTarget = (Component) =>
   class extends React.Component {
     constructor(props) {
       super(props);
-      const { browser } = this.props;
+      const { browser, setDraggingEnabled } = this.props;
 
 
       this.state = {
@@ -29,6 +28,7 @@ const withTarget = (Component) =>
         targetMode: getTargetMode(browser),
       };
 
+      this.setDraggingEnabled = setDraggingEnabled;
       this.setTarget = this.setTarget.bind(this);
       this.clearTarget = this.clearTarget.bind(this);
       this.getTargetState = this.getTargetState.bind(this);
@@ -40,7 +40,7 @@ const withTarget = (Component) =>
     }
 
     getTargetState() {
-      const { target, targetCaptured, targetMode } = this.state;
+      const { target, targetCaptured } = this.state;
 
       if (targetCaptured) {
         return 'ready';
@@ -54,6 +54,11 @@ const withTarget = (Component) =>
 
     setTarget(targetType, target, targetData) {
       const { targetMode } = this.state;
+
+      if (targetMode !== TARGET_MODES.DOUBLE_CLICK) {
+        this.setDraggingEnabled(false);
+      }
+
       this.setState({
         targetCaptured: targetMode === TARGET_MODES.DEFAULT,
         targetType,
@@ -63,6 +68,7 @@ const withTarget = (Component) =>
     }
 
     clearTarget() {
+      this.setDraggingEnabled(true);
       this.setState(INITIAL_STATE);
     }
 

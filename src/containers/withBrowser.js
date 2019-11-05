@@ -1,12 +1,4 @@
 import React from 'react';
-import get from 'lodash/get';
-
-
-const INITIAL_STATE = {
-  targetType: undefined,
-  targetData: {},
-  target: undefined,
-};
 
 const withBrowser= (Component) =>
   class extends React.Component {

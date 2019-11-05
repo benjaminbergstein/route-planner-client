@@ -1,14 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import compose from 'recompose/compose';
-import slice from 'lodash/slice';
-import {
-  Map,
-  Pane,
-  LayerGroup,
-  TileLayer,
-  Circle,
-  Polyline,
-} from 'react-leaflet';
+import { Map, TileLayer } from 'react-leaflet';
 import L from 'leaflet';
 
 import './App.css';
@@ -17,8 +9,9 @@ import withTarget, { TARGET_MODES } from '../../containers/withTarget';
 import withLocationHash from '../../containers/withLocationHash';
 import withBrowser from '../../containers/withBrowser';
 import withTrackEvent from '../../containers/withTrackEvent';
+import withDragging from '../../containers/withDragging';
 import { ControlsPanel, Button } from '../Controls';
-import HoverCircle from '../HoverCircle';
+import RoutePlotter from '../RoutePlotter';
 
 const determineBounds = ({ loading, path }) => {
   if (loading && path.length > 0) {
@@ -29,8 +22,6 @@ const determineBounds = ({ loading, path }) => {
   return undefined;
 }
 
-const FEET_PER_MILES = 5280.0;
-const MILES_PER_METER = 0.0006213712;
 const INIITAL_CENTER = {
   center: [37.773033, -122.438811],
   zoom: "15"
@@ -45,6 +36,7 @@ class App extends React.Component {
 
   render() {
     const {
+      draggingEnabled,
       accessToken,
       setTarget,
       clearTarget,
@@ -55,10 +47,10 @@ class App extends React.Component {
       lines,
       routeMetadata,
       target,
-      targetType,
       targetMode,
       loading,
       wrapWithTrackEvent,
+      browser,
     } = this.props;
     const {
       totalDistanceMiles,
@@ -66,6 +58,7 @@ class App extends React.Component {
       endStreet,
       topStreets,
     } = routeMetadata;
+    const { isMobileDevice } = browser;
     const { zoom } = this.state;
 
     if (startStreet) {
@@ -81,8 +74,9 @@ class App extends React.Component {
     return (
       <div style={{position: 'relative', height: '100%'}}>
         <Map
-          dragging={target === undefined || targetMode === TARGET_MODES.DOUBLE_CLICK}
+          dragging={draggingEnabled}
           style={{height: '100%'}}
+          doubleClickZoom={!isMobileDevice}
           onViewportChanged={({ zoom }) => this.setState({ zoom })}
           onClick={this.handleClick}
           {...additionalProps}
@@ -92,35 +86,12 @@ class App extends React.Component {
             url={`https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=${accessToken}`}
             id='mapbox.streets'
           />
-          {lines.map((coords, i) => (
-            <>
-              <Polyline
-                weight='5'
-                opacity={0.6}
-                positions={coords}
-                onMouseDown={(e) => setTarget('polyline', e.target, { startLatlng: path[i] })}
-              />
-              {slice(coords, 1, -1).map((latlng, ii) => ii % 3 === 0 && (
-                <HoverCircle
-                  zoom={zoom}
-                  profile='SMALL'
-                  center={latlng}
-                  onMouseDown={(e) => setTarget('polyline', e.target, { startLatlng: path[i] })}
-                />
-              ))}
-            </>
-          ))}
-          <Pane name='coordinates'>
-            {path.map((latlng) => (
-              <HoverCircle
-                pane='coordinates'
-                profile='LARGE'
-                center={latlng}
-                zoom={zoom}
-                onMouseDown={(e) => setTarget('waypoint', e.target, { latlng })}
-              />
-            ))}
-          </Pane>
+          <RoutePlotter
+            setTarget={setTarget}
+            path={path}
+            lines={lines}
+            zoom={zoom}
+          />
         </Map>
         <ControlsPanel>
           {target && targetMode === TARGET_MODES.DOUBLE_CLICK && (
@@ -140,7 +111,6 @@ class App extends React.Component {
       appendPoint,
       movePoint,
       clearTarget,
-      target,
       targetType,
       targetData,
       getTargetState,
@@ -170,6 +140,7 @@ class App extends React.Component {
 
 export default compose(
   withTrackEvent('map'),
+  withDragging,
   withBrowser,
   withLocationHash,
   withRoute,
