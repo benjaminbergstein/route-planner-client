@@ -2,6 +2,6 @@ version: '3.7'
 services:
    letsencrypt:
       image: certbot/certbot:latest
-      command: ["certonly", "-d", "${DOMAIN}", "--manual"]
+      command: ["certonly", "-d", "${DOMAIN}", "--manual", "--preferred-challenges=dns", "--agree-tos"]
       volumes:
          - ${DATA_DIR:-./data}/letsencrypt:/etc/letsencrypt

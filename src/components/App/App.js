@@ -1,9 +1,8 @@
 import React from 'react';
 import compose from 'recompose/compose';
-import { Map, TileLayer } from 'react-leaflet';
+import { Map, TileLayer, Circle, Pane } from 'react-leaflet';
 import L from 'leaflet';
 
-import './App.css';
 import withRoute from '../../containers/withRoute/index';
 import withTarget, { TARGET_MODES } from '../../containers/withTarget';
 import withLocationHash from '../../containers/withLocationHash';
@@ -32,6 +31,16 @@ class App extends React.Component {
     super(props);
     this.state = { zoom: 15 };
     this.handleClick = this.handleClick.bind(this);
+    this.handleReady= this.handleReady.bind(this);
+  }
+
+  handleReady({ target: map }) {
+    if (process.env.REACT_APP_HTTPS === 'true') {
+      map.on('locationfound', (e) => {
+        this.setState({ userLocation: e.latlng })
+      });
+      map.locate({ watch: true });
+    }
   }
 
   render() {
@@ -59,7 +68,7 @@ class App extends React.Component {
       topStreets,
     } = routeMetadata;
     const { isMobileDevice } = browser;
-    const { zoom } = this.state;
+    const { zoom, userLocation } = this.state;
 
     if (startStreet) {
       const description = `${totalDistanceMiles} mile(s), ${startStreet} - ${endStreet} via ${topStreets.join(' & ')}`;
@@ -79,6 +88,7 @@ class App extends React.Component {
           doubleClickZoom={!isMobileDevice}
           onViewportChanged={({ zoom }) => this.setState({ zoom })}
           onClick={this.handleClick}
+          whenReady={this.handleReady}
           {...additionalProps}
         >
           <TileLayer
@@ -92,6 +102,30 @@ class App extends React.Component {
             lines={lines}
             zoom={zoom}
           />
+          <Pane name='userLocation'>
+            {userLocation && (
+              <>
+                <Circle
+                  pane='userLocation'
+                  radius={Math.pow(31 - zoom, 5) / 40000 * 3}
+                  stroke={false}
+                  fillColor='#dcdad6'
+                  fillOpacity={0.8}
+                  center={userLocation}
+                />
+                <Circle
+                  pane='userLocation'
+                  radius={Math.pow(31 - zoom, 5) / 40000 * 1}
+                  weight={3}
+                  fillColor='#5494ff'
+                  fillOpacity={1}
+                  color='white'
+                  opacity={0.7}
+                  center={userLocation}
+                />
+              </>
+            )}
+          </Pane>
         </Map>
         <ControlsPanel>
           {target && targetMode === TARGET_MODES.DOUBLE_CLICK && (

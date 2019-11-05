@@ -23,7 +23,7 @@ const RoutePlotter = (props) => {
             positions={coords}
             onMouseDown={(e) => setTarget('polyline', e.target, { startLatlng: path[i] })}
           />
-          {slice(coords, 1, -1).map((latlng, ii) => ii % 3 === 0 && (
+          {zoom > 12 && slice(coords, 1, -1).map((latlng, ii) => ii % 3 === 0 && (
             <HoverCircle
               zoom={zoom}
               profile='SMALL'
