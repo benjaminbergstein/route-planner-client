@@ -2,13 +2,12 @@ version: '3.7'
 services:
    haproxy:
       image: haproxy:1.7
-      ports:
-         - "8080:80"
       volumes:
          - ./config/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
          - ${DATA_DIR:-./data}/letsencrypt:/etc/letsencrypt
       networks:
          - routeplanner
+         - haproxy-controller_haproxy-controller
 
    routeservice:
       image: benbergstein/open-route-service:SanFrancisco
@@ -26,8 +25,9 @@ services:
    client:
       image: benbergstein/route-web:latest
       environment:
+         - REACT_APP_HTTPS=true
          - REACT_APP_TILE_SERVICE_KEY=${TILE_SERVICE_KEY}
-         - REACT_APP_ROUTING_HOST=route.${HOSTNAME}:8080
+         - REACT_APP_ROUTING_HOST=dev.routeplanner.benjaminbergstein.com/route
       command: ["start"]
       volumes:
          - .:/app
@@ -36,3 +36,5 @@ services:
 
 networks:
    routeplanner:
+   haproxy-controller_haproxy-controller:
+      external: true

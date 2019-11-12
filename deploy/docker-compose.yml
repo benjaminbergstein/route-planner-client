@@ -2,14 +2,14 @@ version: '3.7'
 services:
    haproxy:
       image: haproxy:1.7
-      ports:
-         - "80:80"
-         - "443:443"
       volumes:
          - ./deploy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
          - ${DATA_DIR:-./data}/letsencrypt:/etc/letsencrypt
       networks:
          - routeplanner-deploy
+         - haproxy-controller_haproxy-controller
+      ports:
+         - "8081:8081"
 
    routeservice:
       image: benbergstein/open-route-service:BayArea
@@ -23,6 +23,7 @@ services:
          - CATALINA_OPTS= -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9001 -Dcom.sun.management.jmxremote.rmi.port=9001 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=localhost
       networks:
          - routeplanner-deploy
+         - haproxy-controller_haproxy-controller
 
    app:
       image: benbergstein/route-web:latest
@@ -33,6 +34,9 @@ services:
          - REACT_APP_HTTPS
       networks:
          - routeplanner-deploy
+         - haproxy-controller_haproxy-controller
 
 networks:
    routeplanner-deploy:
+   haproxy-controller_haproxy-controller:
+      external: true
