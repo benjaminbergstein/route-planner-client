@@ -8,16 +8,13 @@ const PROFILES = {
   LARGE: { radius: 2 },
 };
 
-const ActiveCircle = ({ zoom, profile, ...props }) => {
-  const [active, setActive] = useState(false);
+const ActiveCircle = ({ isActive: active, zoom, profile, ...props }) => {
   const { radius } = PROFILES[profile];;
   const zoomFactor = Math.pow(31 - zoom, 4) / 6000;
 
   return (
     <Circle
       radius={(active ? radius * 1.5 : radius) * zoomFactor}
-      onMouseOver={() => setActive(true)}
-      onMouseOut={() => setActive(false)}
       fillColor={active ? 'white' : BLUE}
       fillOpacity={1}
       color='#6880a7'

@@ -3,7 +3,6 @@ import compose from 'recompose/compose';
 import { Map, TileLayer } from 'react-leaflet';
 import L from 'leaflet';
 
-import './App.css';
 import withRoute from '../../containers/withRoute/index';
 import withTarget, { TARGET_MODES } from '../../containers/withTarget';
 import withLocationHash from '../../containers/withLocationHash';
@@ -12,6 +11,7 @@ import withTrackEvent from '../../containers/withTrackEvent';
 import withDragging from '../../containers/withDragging';
 import { ControlsPanel, Button } from '../Controls';
 import RoutePlotter from '../RoutePlotter';
+import handleClick from './handleClick';
 
 const determineBounds = ({ loading, path }) => {
   if (loading && path.length > 0) {
@@ -39,6 +39,7 @@ class App extends React.Component {
       draggingEnabled,
       accessToken,
       setTarget,
+      target,
       clearTarget,
       undo,
       redo,
@@ -46,7 +47,6 @@ class App extends React.Component {
       path,
       lines,
       routeMetadata,
-      target,
       targetMode,
       loading,
       wrapWithTrackEvent,
@@ -88,6 +88,7 @@ class App extends React.Component {
           />
           <RoutePlotter
             setTarget={setTarget}
+            target={target}
             path={path}
             lines={lines}
             zoom={zoom}
@@ -110,31 +111,35 @@ class App extends React.Component {
     const {
       appendPoint,
       movePoint,
+      setTarget,
+      target,
       clearTarget,
       targetType,
       targetData,
       getTargetState,
       trackEvent,
+      path,
+      lines,
     } = this.props;
+    const {
+      zoom,
+    } = this.state;
 
-    const targetState = getTargetState();
-
-    if (targetState === 'ready') {
-      if (targetType === 'polyline') {
-        const { startLatlng } = targetData;
-        appendPoint({ latlng, after: startLatlng });
-        clearTarget();
-        trackEvent({ action: 'appendPoint:insert' })
-      } else if (targetType === 'waypoint') {
-        const { latlng: oldLatlng } = targetData;
-        movePoint(oldLatlng, latlng);
-        clearTarget();
-        trackEvent({ action: 'appendPoint:insert' })
-      }
-    } else if (targetState === false) {
-      appendPoint({ latlng });
-      trackEvent({ action: 'appendPoint:push' })
-    }
+    handleClick({
+      latlng,
+      appendPoint,
+      movePoint,
+      setTarget,
+      target,
+      clearTarget,
+      targetType,
+      targetData,
+      getTargetState,
+      trackEvent,
+      path,
+      lines,
+      zoom,
+    });
   }
 }
 

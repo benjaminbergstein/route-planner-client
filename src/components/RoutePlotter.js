@@ -5,9 +5,17 @@ import L from 'leaflet';
 
 import HoverCircle from './HoverCircle';
 
+const isSameLatLng = (latlng1, latlng2) => {
+  if (!latlng1 || !latlng2) return false;
+  const { lat: lat1, lng: lng1 } = latlng1;
+  const { lat: lat2, lng: lng2 } = latlng2;
+  return lat1 === lat2 && lng1 === lng2;
+};
+
 const RoutePlotter = (props) => {
   const {
     setTarget,
+    target,
     path,
     lines,
     zoom,
@@ -21,14 +29,13 @@ const RoutePlotter = (props) => {
             weight='5'
             opacity={0.6}
             positions={coords}
-            onMouseDown={(e) => setTarget('polyline', e.target, { startLatlng: path[i] })}
           />
-          {slice(coords, 1, -1).map((latlng, ii) => ii % 3 === 0 && (
+          {slice(coords, 1, -1).map(([lat, lng], ii) => ii % 3 === 0 && (
             <HoverCircle
+              isActive={isSameLatLng(target, { lat, lng })}
               zoom={zoom}
               profile='SMALL'
-              center={latlng}
-              onMouseDown={(e) => setTarget('polyline', e.target, { startLatlng: path[i] })}
+              center={{ lat, lng}}
             />
           ))}
         </>
@@ -38,9 +45,9 @@ const RoutePlotter = (props) => {
           <HoverCircle
             pane='coordinates'
             profile='LARGE'
+            isActive={isSameLatLng(target, latlng)}
             center={latlng}
             zoom={zoom}
-            onMouseDown={(e) => setTarget('waypoint', e.target, { latlng })}
           />
         ))}
       </Pane>
