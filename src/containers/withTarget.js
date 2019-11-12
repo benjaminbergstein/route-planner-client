@@ -2,8 +2,8 @@ import React from 'react';
 
 const TARGET_MODES = {
   DOUBLE_CLICK: 'double-click',
-  DEFAULT: 'default',
 };
+TARGET_MODES.DEFAULT = TARGET_MODES.DOUBLE_CLICK;
 
 const INITIAL_STATE = {
   targetCaptured: false,
@@ -13,8 +13,7 @@ const INITIAL_STATE = {
   targetMode: TARGET_MODES.DEFAULT,
 };
 
-const getTargetMode = ({ isMobileDevice }) => isMobileDevice ?
-  TARGET_MODES.DOUBLE_CLICK : TARGET_MODES.DEFAULT;
+const getTargetMode = () => TARGET_MODES.DEFAULT;
 
 const withTarget = (Component) =>
   class extends React.Component {
